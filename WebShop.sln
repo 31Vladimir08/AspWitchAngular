@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{85
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService", "Services\IdentityService\IdentityService.csproj", "{5CFEDBFB-81DF-4640-8766-8EE26AA09DC9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{63B170A9-F971-45F2-B0DA-9EC462FB308E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewaysApi", "ApiGateways\GatewaysApi\GatewaysApi.csproj", "{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{5CFEDBFB-81DF-4640-8766-8EE26AA09DC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFEDBFB-81DF-4640-8766-8EE26AA09DC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CFEDBFB-81DF-4640-8766-8EE26AA09DC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5CFEDBFB-81DF-4640-8766-8EE26AA09DC9} = {853465BA-FD4D-4610-B213-91399A4AD939}
+		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A} = {63B170A9-F971-45F2-B0DA-9EC462FB308E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {798E53DA-526A-4673-96D5-5C88832038E4}
