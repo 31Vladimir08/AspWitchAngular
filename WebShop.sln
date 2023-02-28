@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewaysApi", "ApiGateways\GatewaysApi\GatewaysApi.csproj", "{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{6B9B3E98-D59B-4BB5-A552-8219E6620CEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2915E6B2-8CE2-40E9-A5D6-D894327F3A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B9B3E98-D59B-4BB5-A552-8219E6620CEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B9B3E98-D59B-4BB5-A552-8219E6620CEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B9B3E98-D59B-4BB5-A552-8219E6620CEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B9B3E98-D59B-4BB5-A552-8219E6620CEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
