@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.DbContext
 {
-    public class UsersDbContext : IdentityDbContext
+    public class AuthDbContext : IdentityDbContext
     {
-        public UsersDbContext(DbContextOptions<UsersDbContext> options)
+        public AuthDbContext(DbContextOptions<AuthDbContext> options)
             : base(options)
         {
             Database.EnsureCreated();

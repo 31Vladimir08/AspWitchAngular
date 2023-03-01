@@ -16,9 +16,9 @@ var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCr
 {
     Address = disco.TokenEndpoint,
 
-    ClientId = "client",
+    ClientId = "gateways",
     ClientSecret = "secret",
-    Scope = "api1"
+    Scope = "gateways"
 });
 
 if (tokenResponse.IsError)
