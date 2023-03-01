@@ -16,16 +16,16 @@ namespace IdentityService
         public static IEnumerable<ApiScope> ApiScopes =>
             new List<ApiScope>()
             {
-                new ApiScope("gateways", "Geteways Api")
+                new ApiScope("api1", "My API")
             };
 
-        public static IEnumerable<Client> Clients => 
+        public static IEnumerable<Client> Clients =>
             new List<Client>
             {
                 new Client
                 {
-                    ClientId = "gateways",
-                    AllowedGrantTypes = GrantTypes.Code,
+                    ClientId = "client",
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
 
                     ClientSecrets =
                     {
@@ -36,7 +36,7 @@ namespace IdentityService
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Email,
-                        "gateways"
+                        "api1"
                     }
                 }
             };

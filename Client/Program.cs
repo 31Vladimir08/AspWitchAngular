@@ -1,4 +1,4 @@
-﻿// discover endpoints from metadata
+﻿// discover endpoints from metadata-
 using System.Text.Json;
 
 using IdentityModel.Client;
@@ -16,9 +16,9 @@ var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCr
 {
     Address = disco.TokenEndpoint,
 
-    ClientId = "gateways",
+    ClientId = "client",
     ClientSecret = "secret",
-    Scope = "gateways"
+    Scope = "api1"
 });
 
 if (tokenResponse.IsError)
