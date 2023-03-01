@@ -1,4 +1,5 @@
 ﻿using IdentityService.DbContext;
+using IdentityService.ViewModels;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,15 @@ namespace IdentityService.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        [HttpPost]
+        public IActionResult SignIn([FromBody]LoginVm login)
         {
-            var t = _dbContext.Roles.ToList();
+            var currentUser = _dbContext.Users.FirstOrDefault(x => x.Login == login.Login && x.PasswordHash == login.Password);
+            if (currentUser is null)
+            {
+                return NotFound("Wrong login or password");
+            }
+
             return Ok();
         }
     }
