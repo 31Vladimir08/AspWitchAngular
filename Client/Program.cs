@@ -11,6 +11,8 @@ if (disco.IsError)
     return;
 }
 
+/*var a = disco.AuthorizeEndpoint;
+var t = disco.TokenEndpoint;
 // request token
 var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
 {
@@ -19,19 +21,30 @@ var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCr
     ClientId = "client",
     ClientSecret = "secret",
     Scope = "api1"
+});*/
+var tokenResponse2 = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
+{
+    Address = disco.TokenEndpoint,
+
+    ClientId = "client",
+    ClientSecret = "secret",
+    Scope = "api1",
+
+    UserName = "admin@admin.com",
+    Password = "$Admin12345$"
 });
 
-if (tokenResponse.IsError)
+if (tokenResponse2.IsError)
 {
-    Console.WriteLine(tokenResponse.Error);
+    Console.WriteLine(tokenResponse2.Error);
     return;
 }
 
-Console.WriteLine(tokenResponse.AccessToken);
+Console.WriteLine(tokenResponse2.AccessToken);
 
 // call api
 var apiClient = new HttpClient();
-apiClient.SetBearerToken(tokenResponse.AccessToken);
+apiClient.SetBearerToken(tokenResponse2.AccessToken);
 
 var response = await apiClient.GetAsync("https://localhost:7017/identity");
 if (!response.IsSuccessStatusCode)

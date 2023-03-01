@@ -1,5 +1,6 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "gateways");
+        policy.RequireClaim("scope", "api1");
     });
 });
 
@@ -57,6 +58,11 @@ builder.Services.AddSwaggerGen(c =>
 
     });
 });
+
+builder.Services.AddHttpClient("IdentityService", config =>
+{
+    config.BaseAddress = new Uri(builder.Configuration["Services:IdentityServiceApi"]);
+}).AddTransientHttpErrorPolicy(x => x.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(3)));
 
 var app = builder.Build();
 

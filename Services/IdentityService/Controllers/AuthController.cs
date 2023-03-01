@@ -2,29 +2,50 @@
 using IdentityService.ViewModels;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/identity")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthDbContext _dbContext;
-        public AuthController(AuthDbContext dbContext)
+        private readonly AuthDbContext _authDbContext;
+        public AuthController(AuthDbContext authDbContext)
         {
-            _dbContext = dbContext;
+            _authDbContext = authDbContext;
         }
-
-        [HttpPost]
-        public IActionResult SignIn([FromBody]LoginVm login)
+        
+        [HttpGet]
+        public async Task<IActionResult> GetUser(string login)
         {
-            var currentUser = _dbContext.Users.FirstOrDefault(x => x.Login == login.Login && x.PasswordHash == login.Password);
-            if (currentUser is null)
+            var user = await _authDbContext.Users.AsNoTracking()
+                .Join(_authDbContext.UserRoles,
+                    x => x.Id,
+                    ur => ur.UserId,
+                    (x, ur) => new
+                    {
+                        UserId = x.Id,
+                        Login = x.Login,
+                        UserName = x.UserName,
+                        RoleId = ur.RoleId
+                    })
+                .Join(_authDbContext.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new UserVm()
+                    {
+                        UserId = ur.UserId,
+                        Login = ur.Login,
+                        UserName = ur.UserName,
+                        Role = r.Name
+                    })
+                .FirstOrDefaultAsync(x => x.UserName == login);
+            if (user is null)
             {
-                return NotFound("Wrong login or password");
+                return NotFound();
             }
-
-            return Ok();
+            return Ok(user);
         }
     }
 }
