@@ -1,13 +1,9 @@
-﻿using System;
-using System.Data;
-using System.Net;
+﻿using System.Net;
 
 using AutoMapper;
 
 using IdentityService.DbContext;
 using IdentityService.ModelDto;
-using IdentityService.Models;
-using IdentityService.ViewModels;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

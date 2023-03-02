@@ -33,12 +33,22 @@ namespace GatewaysApi.Controllers
         {
             using (var client = _clientFactory.CreateClient(_identitySettingsOption.Name))
             {
+                var json = JsonSerializer.Serialize(userLogin);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync("/api/Account/SignIn", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var exceptionContent = await response.Content.ReadAsStringAsync();
+                    var message = JObject.Parse(exceptionContent);
+                    return Unauthorized("user not found");
+                }
+
+                var userVm = await response.Content.ReadAsAsync<UserVm>();
                 var disco = await client.GetDiscoveryDocumentAsync();
                 if (disco.IsError)
                 {
                     return BadRequest(disco.Error);
                 }
-
                 var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
                 {
                     Address = disco.TokenEndpoint,
@@ -47,7 +57,7 @@ namespace GatewaysApi.Controllers
                     ClientSecret = _identitySettingsOption.ClientSecret,
                     Scope = _identitySettingsOption.Scope,
 
-                    UserName = userLogin.Login,
+                    UserName = userLogin.Username,
                     Password = userLogin.Password
                 });
 
@@ -56,8 +66,6 @@ namespace GatewaysApi.Controllers
                     return Unauthorized("user not found");
                 }
 
-                var response = await client.GetAsync($"api/User?login={userLogin.Login}");
-                var userVm = await response.Content.ReadAsAsync<UserVm>();
                 userVm.Token = tokenResponse.AccessToken;
                 return Ok(userVm);
             }
@@ -86,7 +94,7 @@ namespace GatewaysApi.Controllers
             using (var client = _clientFactory.CreateClient(_identitySettingsOption.Name))
             {
                 var json = JsonSerializer.Serialize(userDto);
-                var content = new StringContent(json, Encoding.UTF8);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await client.PostAsync("api/User", content);
                 
                 if (!response.IsSuccessStatusCode)

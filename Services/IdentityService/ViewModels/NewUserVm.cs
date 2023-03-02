@@ -1,8 +1,7 @@
-﻿namespace IdentityService.ModelDto
+﻿namespace IdentityService.ViewModels
 {
-    public class ApplicationUserDto
+    public class NewUserVm
     {
-        public string Id { get; init; }
         public string Login { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
