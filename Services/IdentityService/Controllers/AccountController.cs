@@ -95,29 +95,29 @@ namespace IdentityService.Controllers
                 Login = user.Login
             };
 
-            using (var trans = _authDbContext.Database.BeginTransaction())
+            await using (var trans = await _authDbContext.Database.BeginTransactionAsync())
             {
                 try
                 {
                     var userResult = await _userManager.UserManager.CreateAsync(newUser, user.Password);
                     if (!userResult.Succeeded)
                     {
-                        trans.Rollback();
+                        await trans.RollbackAsync();
                         return BadRequest(userResult.Errors);
                     }
 
                     var userRole = await _userManager.UserManager.AddToRoleAsync(newUser, role.Name);
                     if (!userRole.Succeeded)
                     {
-                        trans.Rollback();
+                        await trans.RollbackAsync();
                         return BadRequest(userResult.Errors);
                     }
 
-                    trans.Commit();
+                    await trans.CommitAsync();
                 }
                 catch (Exception e)
                 {
-                    trans.Rollback();
+                    await trans.RollbackAsync();
                     throw;
                 }
             }

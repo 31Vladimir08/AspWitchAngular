@@ -31,51 +31,49 @@ namespace GatewaysApi.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn([FromBody] LoginVm userLogin)
         {
-            using (var client = _clientFactory.CreateClient(_identitySettingsOption.Name))
+            using var client = _clientFactory.CreateClient(_identitySettingsOption.Name);
+            var json = JsonSerializer.Serialize(userLogin);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/api/Account/SignIn", content);
+            if (!response.IsSuccessStatusCode)
             {
-                var json = JsonSerializer.Serialize(userLogin);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("/api/Account/SignIn", content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    var exceptionContent = await response.Content.ReadAsStringAsync();
-                    var message = JObject.Parse(exceptionContent);
-                    return Unauthorized("user not found");
-                }
-
-                var userVm = await response.Content.ReadAsAsync<UserVm>();
-                var disco = await client.GetDiscoveryDocumentAsync();
-                if (disco.IsError)
-                {
-                    return BadRequest(disco.Error);
-                }
-                var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-
-                    ClientId = _identitySettingsOption.ClientId,
-                    ClientSecret = _identitySettingsOption.ClientSecret,
-                    Scope = _identitySettingsOption.Scope,
-
-                    UserName = userLogin.Username,
-                    Password = userLogin.Password
-                });
-
-                if (string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
-                {
-                    return Unauthorized("user not found");
-                }
-
-                userVm.Token = tokenResponse.AccessToken;
-                return Ok(userVm);
+                var exceptionContent = await response.Content.ReadAsStringAsync();
+                var message = JObject.Parse(exceptionContent);
+                return Unauthorized("user not found");
             }
+
+            var userVm = await response.Content.ReadAsAsync<UserVm>();
+            var disco = await client.GetDiscoveryDocumentAsync();
+            if (disco.IsError)
+            {
+                return BadRequest(disco.Error);
+            }
+            var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = _identitySettingsOption.ClientId,
+                ClientSecret = _identitySettingsOption.ClientSecret,
+                Scope = _identitySettingsOption.Scope,
+
+                UserName = userLogin.Username,
+                Password = userLogin.Password
+            });
+
+            if (string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
+            {
+                return Unauthorized("user not found");
+            }
+
+            userVm.Token = tokenResponse.AccessToken;
+            return Ok(userVm);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
         [Route("SignUp")]
-        public async Task<IActionResult> SignUp([FromBody] RegistrationVm user)
+        public async Task<IActionResult> SignUp([FromBody]RegistrationVm? user)
         {
             if (user is null)
             {
@@ -91,43 +89,46 @@ namespace GatewaysApi.Controllers
                 RoleCode = "USER"
             };
 
-            using (var client = _clientFactory.CreateClient(_identitySettingsOption.Name))
-            {
-                var json = JsonSerializer.Serialize(userDto);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("api/User", content);
+            using var client = _clientFactory.CreateClient(_identitySettingsOption.Name);
+            var json = JsonSerializer.Serialize(userDto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("api/User", content);
                 
-                if (!response.IsSuccessStatusCode)
-                {
-                    var exceptionContent = await response.Content.ReadAsStringAsync();
-                    var message = JObject.Parse(exceptionContent);
-                    return BadRequest(message["Message"].ToString());
-                }
-
-                using var contentStream = await response.Content.ReadAsStreamAsync();
-                var userVm = await JsonSerializer.DeserializeAsync<UserVm>(contentStream);
-
-                var disco = await client.GetDiscoveryDocumentAsync();
-                if (disco.IsError)
-                {
-                    return BadRequest(disco.Error);
-                }
-
-                var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-
-                    ClientId = _identitySettingsOption.ClientId,
-                    ClientSecret = _identitySettingsOption.ClientSecret,
-                    Scope = _identitySettingsOption.Scope,
-
-                    UserName = user.Login,
-                    Password = user.Password
-                });
-
-                userVm.Token = tokenResponse.AccessToken;
-                return Ok(userVm);
+            if (!response.IsSuccessStatusCode)
+            {
+                var exceptionContent = await response.Content.ReadAsStringAsync();
+                var message = JObject.Parse(exceptionContent);
+                return BadRequest(message["Message"].ToString());
             }
+
+            await using var contentStream = await response.Content.ReadAsStreamAsync();
+            var userVm = await JsonSerializer.DeserializeAsync<UserVm>(contentStream);
+
+            var disco = await client.GetDiscoveryDocumentAsync();
+            if (disco.IsError)
+            {
+                return BadRequest(disco.Error);
+            }
+
+            var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
+            {
+                Address = disco.TokenEndpoint,
+
+                ClientId = _identitySettingsOption.ClientId,
+                ClientSecret = _identitySettingsOption.ClientSecret,
+                Scope = _identitySettingsOption.Scope,
+
+                UserName = user.Login,
+                Password = user.Password
+            });
+
+            if (userVm == null || string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
+            {
+                return Unauthorized("user not found");
+            }
+                    
+            userVm.Token = tokenResponse?.AccessToken;
+            return Ok(userVm);
         }
     }
 }

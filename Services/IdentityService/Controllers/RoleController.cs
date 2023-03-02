@@ -45,11 +45,6 @@ namespace IdentityService.Controllers
         public async Task<IActionResult> GetRoles()
         {
             var role = await _roleManager.Roles.ToListAsync();
-            
-            if (role is null)
-            {
-                return BadRequest();
-            }
 
             var rolesDto = _mapper.Map<IEnumerable<RoleDto>>(role);
 
