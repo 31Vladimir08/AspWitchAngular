@@ -1,6 +1,6 @@
-﻿namespace IdentityService.ModelDto
+﻿namespace GatewaysApi.ModelDto.Auth
 {
-    public class ApplicationUserDto
+    public class UserDto
     {
         public string Id { get; init; }
         public string Login { get; set; }

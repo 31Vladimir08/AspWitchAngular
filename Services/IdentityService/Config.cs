@@ -1,4 +1,7 @@
-﻿using Duende.IdentityServer;
+﻿using System.Data;
+using System.Reflection.Metadata;
+
+using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 
 namespace IdentityService
@@ -16,7 +19,24 @@ namespace IdentityService
         public static IEnumerable<ApiScope> ApiScopes =>
             new List<ApiScope>()
             {
-                new ApiScope("api1", "My API")
+                new ApiScope("identityApi", "My API")
+            };
+
+        public static IEnumerable<ApiResource> ApiResources =>
+            new List<ApiResource>()
+            {
+                new ApiResource()
+                {
+                    Name = "IS4API",
+                    Scopes = new List<string>()
+                    {
+                        "identityApi"
+                    },
+                    UserClaims = new List<string>()
+                    {
+                        "role"
+                    }
+                }
             };
 
         public static IEnumerable<Client> Clients =>
@@ -26,6 +46,8 @@ namespace IdentityService
                 {
                     ClientId = "client",
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                    RequirePkce = false,
+                    AllowRememberConsent = false,
 
                     ClientSecrets =
                     {
@@ -36,7 +58,7 @@ namespace IdentityService
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Email,
-                        "api1"
+                        "identityApi"
                     }
                 }
             };

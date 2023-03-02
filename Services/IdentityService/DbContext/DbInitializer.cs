@@ -8,12 +8,10 @@ namespace IdentityService.DbContext
 {
     public class DbInitializer : IDbInitializer
     {
-        private readonly AuthDbContext _authDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public DbInitializer(AuthDbContext authDbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public DbInitializer(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _authDbContext = authDbContext;
             _userManager = userManager;
             _roleManager = roleManager;
         }

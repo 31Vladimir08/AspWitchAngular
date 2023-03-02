@@ -1,3 +1,6 @@
+using GatewaysApi.Options.IdentityService;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Polly;
@@ -24,7 +27,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "api1");
+        policy.RequireClaim("scope", builder.Configuration["Services:IdentitySettings:Scope"]);
     });
 });
 
@@ -59,9 +62,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddHttpClient("IdentityService", config =>
+var t = builder.Configuration["Services:IdentitySettings:Name"];
+builder.Services.Configure<IdentitySettingsOption>(
+    builder.Configuration.GetSection("IdentitySettings"));
+
+builder.Services.AddHttpClient(builder.Configuration["IdentitySettings:Name"], config =>
 {
-    config.BaseAddress = new Uri(builder.Configuration["Services:IdentityServiceApi"]);
+    config.BaseAddress = new Uri(builder.Configuration["IdentitySettings:IdentityServiceApi"]);
 }).AddTransientHttpErrorPolicy(x => x.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(3)));
 
 var app = builder.Build();

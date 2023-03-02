@@ -27,8 +27,8 @@ var tokenResponse2 = await client.RequestPasswordTokenAsync(new PasswordTokenReq
     Address = disco.TokenEndpoint,
 
     ClientId = "client",
+    Scope = "identityApi",
     ClientSecret = "secret",
-    Scope = "api1",
 
     UserName = "admin@admin.com",
     Password = "$Admin12345$"
@@ -46,7 +46,7 @@ Console.WriteLine(tokenResponse2.AccessToken);
 var apiClient = new HttpClient();
 apiClient.SetBearerToken(tokenResponse2.AccessToken);
 
-var response = await apiClient.GetAsync("https://localhost:7017/identity");
+var response = await apiClient.GetAsync("https://localhost:7017/WeatherForecast");
 if (!response.IsSuccessStatusCode)
 {
     Console.WriteLine(response.StatusCode);

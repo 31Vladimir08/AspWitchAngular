@@ -1,4 +1,4 @@
-﻿namespace GatewaysApi.ViewModels
+﻿namespace GatewaysApi.ViewModels.Auth
 {
     public class LoginVm
     {

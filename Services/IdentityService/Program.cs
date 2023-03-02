@@ -1,9 +1,8 @@
 using IdentityService;
+using IdentityService.Automapper;
 using IdentityService.DbContext;
 using IdentityService.Interfaces.Initialazer;
 using IdentityService.Models;
-
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -17,21 +16,22 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
+.AddDefaultTokenProviders();
 
 builder.Services.AddIdentityServer(options =>
     {
         options.Events.RaiseErrorEvents = true;
-        options.Events.RaiseInformationEvents = true;
         options.Events.RaiseFailureEvents = true;
-        options.Events.RaiseSuccessEvents = true;
-        options.EmitStaticAudienceClaim = true;
+        options.Events.RaiseErrorEvents = true;
     })
     .AddAspNetIdentity<ApplicationUser>()
     .AddInMemoryApiScopes(Config.ApiScopes)
+    .AddInMemoryApiResources(Config.ApiResources)
     .AddInMemoryClients(Config.Clients)
-    .AddInMemoryIdentityResources(Config.IdentityResources);
+    .AddInMemoryIdentityResources(Config.IdentityResources)
+    .AddDeveloperSigningCredential();
 
+builder.Services.AddAutoMapper(typeof(AutoMapProfiler), typeof(Program));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 builder.Services.AddSwaggerGen(config =>
