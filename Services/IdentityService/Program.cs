@@ -34,9 +34,35 @@ builder.Services.AddIdentityServer(options =>
 builder.Services.AddAutoMapper(typeof(AutoMapProfiler), typeof(Program));
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
-builder.Services.AddSwaggerGen(config =>
+builder.Services.AddSwaggerGen(c =>
 {
-    config.SwaggerDoc("v1", new OpenApiInfo { Title = "GatewaysAPI", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GatewaysAPI", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"Enter 'Bearer' [space] and your token",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                },
+                Scheme="oauth2",
+                Name="Bearer",
+                In=ParameterLocation.Header
+            },
+            new List<string>()
+        }
+
+    });
 });
 
 var app = builder.Build();
