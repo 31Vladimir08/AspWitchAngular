@@ -34,7 +34,7 @@ namespace IdentityService.DbContext
                     Email = "admin@admin.com",
                     UserName = "admin@admin.com",
                     NormalizedUserName = "Admin",
-                    Login = "admin@admin.com"
+                    DisplayName = "admin@admin.com"
                 };
 
                 _userManager.CreateAsync(admin, "$Admin12345$").GetAwaiter().GetResult();

@@ -82,7 +82,7 @@ namespace GatewaysApi.Controllers
             var userDto = new UserDto()
             {
                 UserName = user.UserName,
-                Login = user.Login,
+                DisplayName = user.DisplayName,
                 Password = user.Password,
                 Email = user.Email,
                 RoleCode = "USER"
@@ -117,7 +117,7 @@ namespace GatewaysApi.Controllers
                 ClientSecret = _identitySettingsOption.ClientSecret,
                 Scope = _identitySettingsOption.Scope,
 
-                UserName = user.Login,
+                UserName = user.UserName,
                 Password = user.Password
             });
 

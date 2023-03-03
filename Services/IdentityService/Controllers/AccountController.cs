@@ -63,7 +63,7 @@ namespace IdentityService.Controllers
                     (ur, r) => new UserVm()
                     {
                         UserId = ur.UserId,
-                        Login = user.Login,
+                        DisplayName = user.DisplayName,
                         UserName = user.UserName,
                         RoleCode = r.NormalizedName
                     })
@@ -74,7 +74,7 @@ namespace IdentityService.Controllers
 
         [HttpPost]
         [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateUser([FromBody] NewUserVm user)
+        public async Task<IActionResult> CreateUser([FromBody] RegistrationVm user)
         {
             var userExist = await _userManager.UserManager.FindByNameAsync(user.UserName);
             if (userExist is not null)
@@ -92,7 +92,7 @@ namespace IdentityService.Controllers
             {
                 Email = user.Email,
                 UserName = user.UserName,
-                Login = user.Login
+                DisplayName = user.DisplayName
             };
 
             await using (var trans = await _authDbContext.Database.BeginTransactionAsync())
@@ -129,7 +129,7 @@ namespace IdentityService.Controllers
                     (x, ur) => new
                     {
                         UserId = x.Id,
-                        Login = x.Login,
+                        DisplayName = x.DisplayName,
                         UserName = x.UserName,
                         RoleId = ur.RoleId
                     })
@@ -139,11 +139,11 @@ namespace IdentityService.Controllers
                     (ur, r) => new UserVm()
                     {
                         UserId = ur.UserId,
-                        Login = ur.Login,
+                        DisplayName = ur.DisplayName,
                         UserName = ur.UserName,
                         RoleCode = r.Name
                     })
-                .FirstOrDefaultAsync(x => x.Login == user.Login);
+                .FirstOrDefaultAsync(x => x.DisplayName == user.DisplayName);
             return Ok(newUserVm);
         }
     }
