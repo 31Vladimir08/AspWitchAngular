@@ -6,7 +6,6 @@ using GatewaysApi.ModelDto.Auth;
 using GatewaysApi.Options.IdentityService;
 using GatewaysApi.ViewModels.Auth;
 using IdentityModel.Client;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -25,7 +24,7 @@ namespace GatewaysApi.Controllers
             _clientFactory = clientFactory;
             _identitySettingsOption = identitySettingsOption.Value;
         }
-
+        
         [AllowAnonymous]
         [Route("SignIn")]
         [HttpPost]
@@ -122,7 +121,7 @@ namespace GatewaysApi.Controllers
                 Password = user.Password
             });
 
-            if (userVm == null || string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
+            if (userVm is null || string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
             {
                 return Unauthorized("user not found");
             }
