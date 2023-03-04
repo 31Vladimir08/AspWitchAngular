@@ -4,6 +4,8 @@ import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { registerAction } from "../../store/actions/register.action";
 import { isSubmittingSelector } from "../../store/selector";
+import { RegisterFormInterface } from "../../types/registerForm.interface";
+import { RegisterRequestInterface } from "../../types/registerRequest.interface";
 
 @Component({
     selector: 'mc-register',
@@ -39,7 +41,16 @@ export class RegisterComponent implements OnInit {
     }
 
     onSubmit(): void {
-        console.log(this.form.value)
-        this.store.dispatch(registerAction(this.form.value))
+        const registerForm: RegisterFormInterface = this.form.value
+        /*this.form.setErrors({ ...this.form.errors, 'yourErrorName': true });
+        return;*/
+        
+        const registerRequest: RegisterRequestInterface = {
+            displayName: registerForm.displayName,
+            email: registerForm.email,
+            userName: registerForm.userName,
+            password: registerForm.password
+        }
+        this.store.dispatch(registerAction({request: registerRequest}))
     }
 }
