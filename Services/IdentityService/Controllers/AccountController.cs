@@ -73,6 +73,7 @@ namespace IdentityService.Controllers
         }
 
         [HttpPost]
+        [Route("SignUp")]
         [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CreateUser([FromBody] RegistrationVm user)
         {

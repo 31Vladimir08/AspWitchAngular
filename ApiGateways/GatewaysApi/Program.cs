@@ -7,6 +7,12 @@ using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options => options.AddPolicy("Angular", b => b
+    .WithOrigins(builder.Configuration["Services:AngularUI"])
+    .AllowAnyHeader()
+    .AllowAnyMethod())
+);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -27,7 +33,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", builder.Configuration["Services:IdentitySettings:Scope"]);
+        policy.RequireClaim("scope", builder.Configuration["IdentitySettings:Scope"]);
     });
 });
 
@@ -62,7 +68,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var t = builder.Configuration["Services:IdentitySettings:Name"];
 builder.Services.Configure<IdentitySettingsOption>(
     builder.Configuration.GetSection("IdentitySettings"));
 
@@ -72,6 +77,8 @@ builder.Services.AddHttpClient(builder.Configuration["IdentitySettings:Name"], c
 }).AddTransientHttpErrorPolicy(x => x.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(3)));
 
 var app = builder.Build();
+
+app.UseCors("Angular");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

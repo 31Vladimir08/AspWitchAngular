@@ -91,7 +91,7 @@ namespace GatewaysApi.Controllers
             using var client = _clientFactory.CreateClient(_identitySettingsOption.Name);
             var json = JsonSerializer.Serialize(userDto);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("api/User", content);
+            var response = await client.PostAsync("/api/Account/SignUp", content);
                 
             if (!response.IsSuccessStatusCode)
             {
