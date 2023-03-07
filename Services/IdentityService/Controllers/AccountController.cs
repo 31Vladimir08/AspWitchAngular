@@ -104,14 +104,14 @@ namespace IdentityService.Controllers
                     if (!userResult.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(userResult.Errors);
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
                     }
 
                     var userRole = await _userManager.UserManager.AddToRoleAsync(newUser, role.Name);
                     if (!userRole.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(userResult.Errors);
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
                     }
 
                     await trans.CommitAsync();

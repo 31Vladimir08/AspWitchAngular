@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -97,7 +98,13 @@ namespace GatewaysApi.Controllers
             {
                 var exceptionContent = await response.Content.ReadAsStringAsync();
                 var message = JObject.Parse(exceptionContent);
-                return BadRequest(message["Message"].ToString());
+                return BadRequest(new {
+                    Errors = new Hashtable()
+                    {
+                        {"Errors", message["errors"].ToString()}
+                    }
+
+                });
             }
 
             await using var contentStream = await response.Content.ReadAsStreamAsync();

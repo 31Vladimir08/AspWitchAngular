@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { of } from "rxjs";
@@ -16,8 +17,9 @@ export class RegisterEffect {
                     map((currentUser: CurrentUserInterface) => {
                         return registerSuccessAction({currentUser})
                     }),
-                    catchError(() => {
-                        return of(registerFailureAction())
+                    catchError((errorResponse: HttpErrorResponse) => {
+                        console.log(errorResponse.error.errors)
+                        return of(registerFailureAction({errors: errorResponse.error.errors}))
                     })
                 )
             })
