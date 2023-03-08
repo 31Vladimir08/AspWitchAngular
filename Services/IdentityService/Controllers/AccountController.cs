@@ -56,19 +56,29 @@ namespace IdentityService.Controllers
                 return Unauthorized();
             }
 
-            var userVm = await _authDbContext.UserRoles.AsNoTracking()
+            var userVm = await _authDbContext.Users.AsNoTracking()
+                .Join(_authDbContext.UserRoles,
+                    x => x.Id,
+                    ur => ur.UserId,
+                    (x, ur) => new
+                    {
+                        UserId = x.Id,
+                        DisplayName = x.DisplayName,
+                        UserName = x.UserName,
+                        RoleId = ur.RoleId
+                    })
                 .Join(_authDbContext.Roles,
                     ur => ur.RoleId,
                     r => r.Id,
                     (ur, r) => new UserVm()
                     {
                         UserId = ur.UserId,
-                        DisplayName = user.DisplayName,
-                        UserName = user.UserName,
+                        DisplayName = ur.DisplayName,
+                        UserName = ur.UserName,
                         RoleCode = r.NormalizedName
                     })
-                .FirstOrDefaultAsync(x => x.UserName == user.UserName);
-                
+                .FirstOrDefaultAsync(x => x.UserId == user.Id);
+
             return Ok(userVm);
         }
 
@@ -142,7 +152,7 @@ namespace IdentityService.Controllers
                         UserId = ur.UserId,
                         DisplayName = ur.DisplayName,
                         UserName = ur.UserName,
-                        RoleCode = r.Name
+                        RoleCode = r.NormalizedName
                     })
                 .FirstOrDefaultAsync(x => x.DisplayName == user.DisplayName);
             return Ok(newUserVm);

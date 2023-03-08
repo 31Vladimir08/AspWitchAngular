@@ -29,7 +29,7 @@ namespace GatewaysApi.Controllers
         [AllowAnonymous]
         [Route("SignIn")]
         [HttpPost]
-        public async Task<IActionResult> SignIn([FromBody] LoginVm userLogin)
+        public async Task<IActionResult> SignIn([FromBody]LoginVm userLogin)
         {
             using var client = _clientFactory.CreateClient(_identitySettingsOption.Name);
             var json = JsonSerializer.Serialize(userLogin);
