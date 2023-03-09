@@ -13,28 +13,15 @@ namespace IdentityService.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        //private readonly IIdentityServerInteractionService _interaction;
-        //private readonly IClientStore _clientStore;
-        //private readonly IAuthenticationSchemeProvider _schemeProvider;
-        //private readonly IEventService _events;
         private readonly SignInManager<ApplicationUser> _userManager;
         private readonly AuthDbContext _authDbContext;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(
-            /*IIdentityServerInteractionService interaction,
-            IClientStore clientStore,
-            IAuthenticationSchemeProvider schemeProvider,
-            IEventService events,*/
             SignInManager<ApplicationUser> userManager, 
             AuthDbContext authDbContext, 
             RoleManager<IdentityRole> roleManager)
         {
-            /*_interaction = interaction;
-            _clientStore = clientStore;
-            _schemeProvider = schemeProvider;
-            _events = events;*/
-
             _userManager = userManager;
             _authDbContext = authDbContext;
             _roleManager = roleManager;
@@ -56,28 +43,7 @@ namespace IdentityService.Controllers
                 return Unauthorized();
             }
 
-            var userVm = await _authDbContext.Users.AsNoTracking()
-                .Join(_authDbContext.UserRoles,
-                    x => x.Id,
-                    ur => ur.UserId,
-                    (x, ur) => new
-                    {
-                        UserId = x.Id,
-                        DisplayName = x.DisplayName,
-                        UserName = x.UserName,
-                        RoleId = ur.RoleId
-                    })
-                .Join(_authDbContext.Roles,
-                    ur => ur.RoleId,
-                    r => r.Id,
-                    (ur, r) => new UserVm()
-                    {
-                        UserId = ur.UserId,
-                        DisplayName = ur.DisplayName,
-                        UserName = ur.UserName,
-                        RoleCode = r.NormalizedName
-                    })
-                .FirstOrDefaultAsync(x => x.UserId == user.Id);
+            var userVm = await GetUserAsync(user.UserName);
 
             return Ok(userVm);
         }
@@ -133,7 +99,25 @@ namespace IdentityService.Controllers
                 }
             }
 
-            var newUserVm = await _authDbContext.Users.AsNoTracking()
+            var newUserVm = await GetUserAsync(user.UserName);
+            return Ok(newUserVm);
+        }
+
+        [HttpGet]
+        [Route("User")]
+        [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetUser(string username)
+        {
+            var userVm = await GetUserAsync(username);
+
+            return Ok(userVm);
+        }
+
+        private async Task<UserVm?> GetUserAsync(string? username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
+            var userVm = await _authDbContext.Users.AsNoTracking()
                 .Join(_authDbContext.UserRoles,
                     x => x.Id,
                     ur => ur.UserId,
@@ -154,8 +138,8 @@ namespace IdentityService.Controllers
                         UserName = ur.UserName,
                         RoleCode = r.NormalizedName
                     })
-                .FirstOrDefaultAsync(x => x.DisplayName == user.DisplayName);
-            return Ok(newUserVm);
+                .FirstOrDefaultAsync(x => x.UserName == username);
+            return userVm;
         }
     }
 }
