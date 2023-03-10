@@ -1,5 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-light">
     <div class="container-fluid">
+        <img src="https://angular.io/assets/images/logos/angularjs/AngularJS-Shield.svg" alt="Logo" width="40" height="40" class="d-inline-block align-text-top">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -7,7 +8,9 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a [routerLink]="['/']" class="nav-link">Home</a>
+            <a [routerLink]="['/']" class="nav-link">                
+                &nbsp;Home
+            </a>
           </li>
           <ng-container *ngIf="isLoggedIn$ | async">
             <li class="nav-item">
