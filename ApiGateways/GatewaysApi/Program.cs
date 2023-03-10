@@ -1,6 +1,4 @@
 using GatewaysApi.Options.IdentityService;
-
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Polly;
@@ -22,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://localhost:7122";
+        options.Authority = builder.Configuration["IdentitySettings:IdentityServiceApi"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false
