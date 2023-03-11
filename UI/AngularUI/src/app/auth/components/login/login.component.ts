@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { BackendErrorsInterface } from "src/app/shared/types/backendErrors.interface";
@@ -33,12 +33,15 @@ export class LoginComponent implements OnInit {
 
     initializeForm(): void {
         this.form = this.fb.group({
-            email: '',
-            password: ''
+            email: new FormControl('', [Validators.email, Validators.required]),
+            password: new FormControl('', Validators.required)
         })
     }
 
     onSubmit(): void {
+        if (this.form.invalid) {
+            return
+        }
         const loginForm: LoginFormInterface = this.form.value
         
         const loginRequest: LoginRequestInterface = {
@@ -46,5 +49,6 @@ export class LoginComponent implements OnInit {
             password: loginForm.password
         }
         this.store.dispatch(loginAction({request: loginRequest}))
+        this.form.reset()
     }
 }
