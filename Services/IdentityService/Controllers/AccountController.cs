@@ -13,28 +13,15 @@ namespace IdentityService.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        //private readonly IIdentityServerInteractionService _interaction;
-        //private readonly IClientStore _clientStore;
-        //private readonly IAuthenticationSchemeProvider _schemeProvider;
-        //private readonly IEventService _events;
         private readonly SignInManager<ApplicationUser> _userManager;
         private readonly AuthDbContext _authDbContext;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(
-            /*IIdentityServerInteractionService interaction,
-            IClientStore clientStore,
-            IAuthenticationSchemeProvider schemeProvider,
-            IEventService events,*/
             SignInManager<ApplicationUser> userManager, 
             AuthDbContext authDbContext, 
             RoleManager<IdentityRole> roleManager)
         {
-            /*_interaction = interaction;
-            _clientStore = clientStore;
-            _schemeProvider = schemeProvider;
-            _events = events;*/
-
             _userManager = userManager;
             _authDbContext = authDbContext;
             _roleManager = roleManager;
@@ -56,25 +43,15 @@ namespace IdentityService.Controllers
                 return Unauthorized();
             }
 
-            var userVm = await _authDbContext.UserRoles.AsNoTracking()
-                .Join(_authDbContext.Roles,
-                    ur => ur.RoleId,
-                    r => r.Id,
-                    (ur, r) => new UserVm()
-                    {
-                        UserId = ur.UserId,
-                        Login = user.Login,
-                        UserName = user.UserName,
-                        RoleCode = r.NormalizedName
-                    })
-                .FirstOrDefaultAsync(x => x.UserName == user.UserName);
-                
+            var userVm = await GetUserAsync(user.UserName);
+
             return Ok(userVm);
         }
 
         [HttpPost]
+        [Route("SignUp")]
         [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> CreateUser([FromBody] NewUserVm user)
+        public async Task<IActionResult> CreateUser([FromBody] RegistrationVm user)
         {
             var userExist = await _userManager.UserManager.FindByNameAsync(user.UserName);
             if (userExist is not null)
@@ -92,7 +69,7 @@ namespace IdentityService.Controllers
             {
                 Email = user.Email,
                 UserName = user.UserName,
-                Login = user.Login
+                DisplayName = user.DisplayName
             };
 
             await using (var trans = await _authDbContext.Database.BeginTransactionAsync())
@@ -103,14 +80,14 @@ namespace IdentityService.Controllers
                     if (!userResult.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(userResult.Errors);
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
                     }
 
                     var userRole = await _userManager.UserManager.AddToRoleAsync(newUser, role.Name);
                     if (!userRole.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(userResult.Errors);
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
                     }
 
                     await trans.CommitAsync();
@@ -122,14 +99,32 @@ namespace IdentityService.Controllers
                 }
             }
 
-            var newUserVm = await _authDbContext.Users.AsNoTracking()
+            var newUserVm = await GetUserAsync(user.UserName);
+            return Ok(newUserVm);
+        }
+
+        [HttpGet]
+        [Route("User")]
+        [ProducesResponseType(typeof(UserVm), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetUser(string username)
+        {
+            var userVm = await GetUserAsync(username);
+
+            return Ok(userVm);
+        }
+
+        private async Task<UserVm?> GetUserAsync(string? username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return null;
+            var userVm = await _authDbContext.Users.AsNoTracking()
                 .Join(_authDbContext.UserRoles,
                     x => x.Id,
                     ur => ur.UserId,
                     (x, ur) => new
                     {
                         UserId = x.Id,
-                        Login = x.Login,
+                        DisplayName = x.DisplayName,
                         UserName = x.UserName,
                         RoleId = ur.RoleId
                     })
@@ -139,12 +134,12 @@ namespace IdentityService.Controllers
                     (ur, r) => new UserVm()
                     {
                         UserId = ur.UserId,
-                        Login = ur.Login,
+                        DisplayName = ur.DisplayName,
                         UserName = ur.UserName,
-                        RoleCode = r.Name
+                        RoleCode = r.NormalizedName
                     })
-                .FirstOrDefaultAsync(x => x.Login == user.Login);
-            return Ok(newUserVm);
+                .FirstOrDefaultAsync(x => x.UserName == username);
+            return userVm;
         }
     }
 }

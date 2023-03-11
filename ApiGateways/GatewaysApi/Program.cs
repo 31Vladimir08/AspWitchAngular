@@ -1,11 +1,15 @@
 using GatewaysApi.Options.IdentityService;
-
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options => options.AddPolicy("Angular", b => b
+    .WithOrigins(builder.Configuration["Services:AngularUI"])
+    .AllowAnyHeader()
+    .AllowAnyMethod())
+);
 
 // Add services to the container.
 
@@ -16,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAuthentication("Bearer")
     .AddJwtBearer("Bearer", options =>
     {
-        options.Authority = "https://localhost:7122";
+        options.Authority = builder.Configuration["IdentitySettings:IdentityServiceApi"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false
@@ -27,7 +31,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ApiScope", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", builder.Configuration["Services:IdentitySettings:Scope"]);
+        policy.RequireClaim("scope", builder.Configuration["IdentitySettings:Scope"]);
     });
 });
 
@@ -62,7 +66,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-var t = builder.Configuration["Services:IdentitySettings:Name"];
 builder.Services.Configure<IdentitySettingsOption>(
     builder.Configuration.GetSection("IdentitySettings"));
 
@@ -72,6 +75,8 @@ builder.Services.AddHttpClient(builder.Configuration["IdentitySettings:Name"], c
 }).AddTransientHttpErrorPolicy(x => x.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(3)));
 
 var app = builder.Build();
+
+app.UseCors("Angular");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

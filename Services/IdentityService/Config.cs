@@ -1,66 +1,56 @@
-﻿using System.Data;
-using System.Reflection.Metadata;
-
-using Duende.IdentityServer;
+﻿using Duende.IdentityServer;
 using Duende.IdentityServer.Models;
 
 namespace IdentityService
 {
     public static class Config
     {
-        public static IEnumerable<IdentityResource> IdentityResources =>
-            new IdentityResource[]
+        public static IEnumerable<Client> GetClients() =>
+        new List<Client>
+        {
+            new Client
             {
-                new IdentityResources.OpenId(),
-                new IdentityResources.Email(),
-                new IdentityResources.Profile()
-            };
+                ClientId = "GatewaysAPI",
+                AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                RequirePkce = false,
+                AllowRememberConsent = false,
 
-        public static IEnumerable<ApiScope> ApiScopes =>
-            new List<ApiScope>()
-            {
-                new ApiScope("identityApi", "My API")
-            };
-
-        public static IEnumerable<ApiResource> ApiResources =>
-            new List<ApiResource>()
-            {
-                new ApiResource()
+                ClientSecrets =
                 {
-                    Name = "IS4API",
-                    Scopes = new List<string>()
-                    {
-                        "identityApi"
-                    },
-                    UserClaims = new List<string>()
-                    {
-                        "role"
-                    }
-                }
-            };
-
-        public static IEnumerable<Client> Clients =>
-            new List<Client>
-            {
-                new Client
+                    new Secret("secret".Sha256())
+                },
+                AllowedScopes = new List<string>()
                 {
-                    ClientId = "client",
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
-                    RequirePkce = false,
-                    AllowRememberConsent = false,
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-                    AllowedScopes = new List<string>()
-                    {
-                        IdentityServerConstants.StandardScopes.OpenId,
-                        IdentityServerConstants.StandardScopes.Profile,
-                        IdentityServerConstants.StandardScopes.Email,
-                        "identityApi"
-                    }
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email
                 }
-            };
+            }
+        };
+
+
+        public static IEnumerable<ApiResource> GetApiResources()
+        {
+            yield return new ApiResource("GatewaysAPI");
+            //yield return new ApiResource("OrdersAPI");
+            //return new List<ApiResource>();
+        }
+
+        public static IEnumerable<IdentityResource> GetIdentityResources()
+        {
+            yield return new IdentityResources.OpenId();
+            yield return new IdentityResources.Profile();
+        }
+        
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
+            yield return new ApiScope("GatewaysAPI", "Gateways API");
+            //yield return new ApiScope("blazor", "Blazor WebAssembly");
+            //yield return new ApiScope("OrdersAPI", "Orders API");
+            /*return new List<ApiScope>()
+            {
+
+            };*/
+        }
     }
 }

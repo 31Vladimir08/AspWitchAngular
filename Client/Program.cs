@@ -1,6 +1,4 @@
 ﻿// discover endpoints from metadata-
-using System.Text.Json;
-
 using IdentityModel.Client;
 
 var client = new HttpClient();
@@ -11,23 +9,12 @@ if (disco.IsError)
     return;
 }
 
-/*var a = disco.AuthorizeEndpoint;
-var t = disco.TokenEndpoint;
 // request token
-var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
-{
-    Address = disco.TokenEndpoint,
-
-    ClientId = "client",
-    ClientSecret = "secret",
-    Scope = "api1"
-});*/
 var tokenResponse2 = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
 {
     Address = disco.TokenEndpoint,
 
-    ClientId = "client",
-    Scope = "identityApi",
+    ClientId = "GatewaysAPI",
     ClientSecret = "secret",
 
     UserName = "admin@admin.com",
@@ -41,18 +28,18 @@ if (tokenResponse2.IsError)
 }
 
 Console.WriteLine(tokenResponse2.AccessToken);
+var t = GetUserInfo(tokenResponse2.AccessToken);
 
-// call api
-var apiClient = new HttpClient();
-apiClient.SetBearerToken(tokenResponse2.AccessToken);
+string GetUserInfo(string token)
+{
+    var client = new HttpClient();
+    client.SetBearerToken(token);
+    var response = client.GetAsync("https://localhost:7122/connect/userinfo").GetAwaiter().GetResult();
 
-var response = await apiClient.GetAsync("https://localhost:7017/WeatherForecast");
-if (!response.IsSuccessStatusCode)
-{
-    Console.WriteLine(response.StatusCode);
-}
-else
-{
-    var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
-    Console.WriteLine(JsonSerializer.Serialize(doc, new JsonSerializerOptions { WriteIndented = true }));
+    var response1 = client.GetUserInfoAsync(new UserInfoRequest
+    {
+        Address = "https://localhost:7122/connect/userinfo",
+        Token = token
+    }).GetAwaiter().GetResult();
+    return "f";
 }

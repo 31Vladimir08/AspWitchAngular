@@ -5,7 +5,7 @@ namespace GatewaysApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User, Administrator")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
