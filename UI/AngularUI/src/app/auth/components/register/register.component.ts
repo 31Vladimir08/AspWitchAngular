@@ -19,6 +19,7 @@ export class RegisterComponent implements OnInit {
     backendErrors$: Observable<BackendErrorsInterface | null>
 
     constructor(private fb: FormBuilder, private store: Store) {
+        console.log('register')
     }
 
     ngOnInit(): void {
