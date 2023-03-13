@@ -1,3 +1,4 @@
+using GatewaysApi.Middlewares;
 using GatewaysApi.Options.IdentityService;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -89,7 +90,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseException();
 app.MapControllers();
 
 app.Run();

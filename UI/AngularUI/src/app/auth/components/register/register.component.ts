@@ -59,7 +59,6 @@ export class RegisterComponent implements OnInit {
             password: registerForm.password
         }
         this.store.dispatch(registerAction({request: registerRequest}))
-        this.form.reset()
     }
 
     checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
