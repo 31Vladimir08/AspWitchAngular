@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
 
+using GatewaysApi.Exeptions;
 using GatewaysApi.ModelDto.Auth;
 using GatewaysApi.Options.IdentityService;
 using GatewaysApi.ViewModels.Auth;
@@ -14,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-
 namespace GatewaysApi.Controllers
 {
     [Route("api/[controller]")]
@@ -43,21 +41,21 @@ namespace GatewaysApi.Controllers
             {
                 var exceptionContent = await response.Content.ReadAsStringAsync();
                 var message = JObject.Parse(exceptionContent);
-                return Unauthorized("user not found");
+                throw new IdentityException(HttpStatusCode.Unauthorized, message.ToString());
             }
 
             var userVm = await response.Content.ReadAsAsync<UserVm>();
             var disco = await client.GetDiscoveryDocumentAsync();
             if (disco.IsError)
             {
-                return BadRequest(disco.Error);
+                throw new IdentityException(HttpStatusCode.Unauthorized, disco.Error);
             }
 
             var tokenResponse = await GetTokenAsync(client, userLogin.Username, userLogin.Password);
 
             if (string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
             {
-                return Unauthorized("user not found");
+                throw new UserException(HttpStatusCode.Unauthorized, "user not found");
             }
 
             userVm.Token = tokenResponse.AccessToken;
@@ -72,7 +70,7 @@ namespace GatewaysApi.Controllers
         {
             if (user is null)
             {
-                return BadRequest();
+                throw new UserException(HttpStatusCode.BadRequest, "Incorrect request: user is null");
             }
 
             var userDto = new UserDto()
@@ -93,13 +91,7 @@ namespace GatewaysApi.Controllers
             {
                 var exceptionContent = await response.Content.ReadAsStringAsync();
                 var message = JObject.Parse(exceptionContent);
-                return BadRequest(new {
-                    Errors = new Hashtable()
-                    {
-                        {"Errors", message["errors"].ToString()}
-                    }
-
-                });
+                throw new IdentityException(HttpStatusCode.BadRequest, message.ToString());
             }
 
             await using var contentStream = await response.Content.ReadAsStreamAsync();
@@ -109,7 +101,7 @@ namespace GatewaysApi.Controllers
 
             if (userVm is null || string.IsNullOrWhiteSpace(tokenResponse?.AccessToken))
             {
-                return Unauthorized("user not found");
+                throw new UserException(HttpStatusCode.BadRequest, "User not found");
             }
                     
             userVm.Token = tokenResponse?.AccessToken;
@@ -133,7 +125,7 @@ namespace GatewaysApi.Controllers
             });
 
             if (response is null)
-                return Unauthorized("user not found");
+                throw new UserException(HttpStatusCode.Unauthorized, "User not found");
 
             var username = response.Claims.FirstOrDefault(x => x.Type == "name")?.Value;
             
@@ -143,14 +135,7 @@ namespace GatewaysApi.Controllers
             {
                 var exceptionContent = await userResponse.Content.ReadAsStringAsync();
                 var message = JObject.Parse(exceptionContent);
-                return BadRequest(new
-                {
-                    Errors = new Hashtable()
-                    {
-                        {"Errors", message["errors"].ToString()}
-                    }
-
-                });
+                throw new IdentityException(HttpStatusCode.BadRequest, message.ToString());
             }
             var userVm = await userResponse.Content.ReadAsAsync<UserVm>();
             userVm.Token = accessToken;

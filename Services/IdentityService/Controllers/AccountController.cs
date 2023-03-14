@@ -80,14 +80,14 @@ namespace IdentityService.Controllers
                     if (!userResult.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => new { x.Code, x.Description }).ToList() });
                     }
 
                     var userRole = await _userManager.UserManager.AddToRoleAsync(newUser, role.Name);
                     if (!userRole.Succeeded)
                     {
                         await trans.RollbackAsync();
-                        return BadRequest(new { Errors = userResult.Errors.Select(x => x.Description).ToList() });
+                        return BadRequest(new { Errors = userResult.Errors.Select(x => new { x.Code, x.Description}).ToList() });
                     }
 
                     await trans.CommitAsync();

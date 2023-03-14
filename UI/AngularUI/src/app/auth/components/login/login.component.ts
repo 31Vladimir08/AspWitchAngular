@@ -49,6 +49,5 @@ export class LoginComponent implements OnInit {
             password: loginForm.password
         }
         this.store.dispatch(loginAction({request: loginRequest}))
-        this.form.reset()
     }
 }
