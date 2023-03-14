@@ -1,0 +1,51 @@
+<header class="p-3 bg-dark text-white">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a [routerLink]="['/']" class="nav-link px-2 text-secondary">
+            <img src="https://angular.io/assets/images/logos/angularjs/AngularJS-Shield.svg" alt="Logo" width="40" height="40" class="d-inline-block align-text-top">
+            <span class="fs-4">&nbsp;eShop</span>    
+        </a>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li>
+                <a [routerLink]="['/']" class="nav-link px-2 text-secondary">
+                    <i class="bi-house-door-fill"></i>
+                    &nbsp;Home
+                </a>
+            </li>
+        </ul>
+        
+        <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
+            <ng-container *ngIf="isLoggedIn$ | async">
+                <li>
+                    <a [routerLink]="['/articles/new']" class="nav-link px-2 text-white">
+                        <i class="bi bi-cart4"></i>
+                        &nbsp; Basket
+                    </a>
+                </li>
+                <li class="dropdown">
+                    <a [routerLink]="['/settings']" class="nav-link px-2 text-white">
+                        <i class="bi-person-fill"></i>
+                        &nbsp; {{(currentUser$ | async).displayName}}
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="#">
+                            <i class="bi bi-tools"></i>
+                            Settings
+                        </a>
+                        <a href="#">
+                            <i class="bi bi-arrow-left-square"></i>
+                            Logout
+                        </a>
+                    </div>
+                </li>
+            </ng-container>
+            <ng-container *ngIf="isAnonymous$ | async">
+                <button [routerLink]="['/login']" type="button" class="btn btn-outline-light me-2">Login</button>
+                <button [routerLink]="['/register']" type="button" class="btn btn-warning">Sign-up</button>
+            </ng-container>
+        </ul>
+
+        
+      </div>
+    </div>
+  </header>
